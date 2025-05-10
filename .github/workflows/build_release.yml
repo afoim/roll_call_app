@@ -36,6 +36,12 @@ jobs:
       - name: 构建 APK
         run: flutter build apk --release --verbose
       
+      - name: 检查 APK 文件
+        run: |
+          ls -la build/app/outputs/flutter-apk/
+          echo "APK文件大小:" 
+          du -h build/app/outputs/flutter-apk/app-release.apk
+      
       - name: 上传 APK
         uses: actions/upload-artifact@v3
         with:
@@ -66,13 +72,13 @@ jobs:
       - name: 打包 Windows 应用
         run: |
           cd build/windows/x64/runner/Release
-          Compress-Archive -Path * -DestinationPath roll_call_app_windows.zip
+          Compress-Archive -Path * -DestinationPath ../../../../../roll_call_app_windows.zip
       
       - name: 上传 Windows 应用
         uses: actions/upload-artifact@v3
         with:
           name: windows-release
-          path: build/windows/x64/runner/Release/roll_call_app_windows.zip
+          path: roll_call_app_windows.zip
   
   build-linux:
     name: 构建 Linux 应用
@@ -153,6 +159,15 @@ jobs:
     steps:
       - name: 下载所有构建产物
         uses: actions/download-artifact@v3
+        with:
+          path: artifacts
+      
+      - name: 列出下载的文件
+        run: |
+          echo "查找所有文件："
+          find artifacts -type f | sort
+          echo "检查目录结构："
+          ls -R artifacts/
       
       - name: 设置发布标签
         id: set_tag
@@ -163,14 +178,22 @@ jobs:
             echo "TAG_NAME=${{ github.ref_name }}" >> $GITHUB_ENV
           fi
       
+      - name: 准备发布文件
+        id: prepare_files
+        run: |
+          mkdir -p release_files
+          find artifacts -name "*.apk" -exec cp {} release_files/ \;
+          find artifacts -name "*.zip" -exec cp {} release_files/ \;
+          find artifacts -name "*.tar.gz" -exec cp {} release_files/ \;
+          echo "发布文件列表："
+          ls -la release_files/
+      
       - name: 创建 Release
         uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          files: |
-            android-release/app-release.apk
-            windows-release/roll_call_app_windows.zip
-            linux-release/roll_call_app_linux.tar.gz
-            web-release/roll_call_app_web.zip
+          files: release_files/*
           name: 智能点名表 ${{ env.TAG_NAME }}
           body: |
             智能点名表应用 ${{ env.TAG_NAME }} 版本发布
