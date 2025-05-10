@@ -16,7 +16,7 @@ jobs:
     name: 构建 Android APK
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       
       - name: 设置 Java
         uses: actions/setup-java@v3
@@ -43,7 +43,7 @@ jobs:
           du -h build/app/outputs/flutter-apk/app-release.apk
       
       - name: 上传 APK
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: android-release
           path: build/app/outputs/flutter-apk/app-release.apk
@@ -52,7 +52,7 @@ jobs:
     name: 构建 Windows 应用
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       
       - name: 设置 Flutter
         uses: subosito/flutter-action@v2
@@ -75,7 +75,7 @@ jobs:
           Compress-Archive -Path * -DestinationPath ../../../../../roll_call_app_windows.zip
       
       - name: 上传 Windows 应用
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: windows-release
           path: roll_call_app_windows.zip
@@ -84,7 +84,7 @@ jobs:
     name: 构建 Linux 应用
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       
       - name: 安装 Linux 依赖
         run: |
@@ -112,7 +112,7 @@ jobs:
           tar -czvf ../../../../../roll_call_app_linux.tar.gz *
       
       - name: 上传 Linux 应用
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: linux-release
           path: roll_call_app_linux.tar.gz
@@ -121,7 +121,7 @@ jobs:
     name: 构建 Web 应用
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       
       - name: 设置 Flutter
         uses: subosito/flutter-action@v2
@@ -144,7 +144,7 @@ jobs:
           zip -r ../../roll_call_app_web.zip *
       
       - name: 上传 Web 应用
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: web-release
           path: roll_call_app_web.zip
@@ -158,7 +158,7 @@ jobs:
     if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
     steps:
       - name: 下载所有构建产物
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           path: artifacts
       
