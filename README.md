@@ -1,94 +1,180 @@
-# 智能点名表
+# 点名表
 
 一个基于Flutter开发的跨平台点名表应用，支持Windows、Android和Web平台。
 
+[![版本](https://img.shields.io/github/v/release/afoim/roll_call_app)](https://github.com/afoim/roll_call_app/releases)
+[![许可证](https://img.shields.io/github/license/afoim/roll_call_app)](https://github.com/afoim/roll_call_app/blob/main/LICENSE)
+
+<div align="center">
+  <img src="assets/icon/icon.jpg" width="128" height="128" alt="点名表图标">
+</div>
+
 ## 功能特点
 
-- 创建和管理多个点名配置
-- 记录出勤状态
-- 实时显示日期和时间
-- 支持全选/取消选择
-- 支持多平台：Windows、Android和Web
+- **多配置管理**: 创建和管理多个不同的点名配置
+- **实时出勤记录**: 实时记录并显示出勤状态
+- **时间显示**: 自动显示当前日期和时间
+- **批量操作**: 支持全选/取消选择等批量操作
+- **跨平台支持**: 无缝运行于Windows、Android和Web平台
+- **数据持久化**: 自动保存配置和出勤记录
+- **简洁直观**: 简洁美观的用户界面，操作直观
 
-## 开发环境设置
+## 应用截图
 
-1. 确保已安装Flutter SDK
-2. 克隆此仓库
-3. 运行 `flutter pub get` 安装依赖
+*[这里可以添加应用截图]*
 
+## 快速开始
+
+### 下载安装
+
+从[GitHub Releases](https://github.com/afoim/roll_call_app/releases)页面下载最新版本:
+- Windows用户: 下载`RollCall-Windows.zip`并解压运行
+- Android用户: 下载`RollCall.apk`并安装
+- Web用户: 下载`RollCall-Web.zip`并部署到Web服务器
+
+### 使用指南
+
+1. **创建点名配置**:
+   - 点击右上角设置按钮
+   - 输入配置名称
+   - 输入名单（每行一个名字）
+   - 点击"保存配置"
+
+2. **进行点名**:
+   - 在主界面查看名单
+   - 点击名字标记出勤状态
+   - 使用"全选"/"取消选择"按钮进行批量操作
+
+3. **管理配置**:
+   - 切换不同的点名配置
+   - 编辑或删除现有配置
+
+## 开发者指南
+
+### 环境要求
+
+- Flutter SDK (3.7.0+)
+- Dart SDK (3.0.0+)
+- Android Studio / VS Code
+- Git
+
+### 开发环境设置
+
+1. 克隆仓库:
 ```bash
-git clone <repository-url>
-cd <repository-name>
+git clone https://github.com/afoim/roll_call_app.git
+cd roll_call_app
+```
+
+2. 安装依赖:
+```bash
 flutter pub get
 ```
 
-## 构建应用
+3. 运行调试版本:
+```bash
+flutter run
+```
 
-### Android
+### 一键构建脚本
+
+项目提供了一键构建脚本`build_release.bat`，可同时构建所有平台的发布版本:
+
+```bash
+.\build_release.bat
+```
+
+脚本会自动完成以下任务:
+1. 清理旧的构建文件
+2. 获取项目依赖
+3. 构建Web、Windows和Android版本
+4. 将构建产物汇总到`shell-output`目录
+
+### 单独构建特定平台
+
+#### Android
 
 ```bash
 flutter build apk --release
 ```
 
-### Windows
+#### Windows
 
 ```bash
 flutter config --enable-windows-desktop
 flutter build windows --release
 ```
 
-### Web
+#### Web
 
 ```bash
+flutter config --enable-web
 flutter build web --release
 ```
 
-## CI/CD 设置
+### 技术细节
 
-本项目使用GitHub Actions自动构建和发布应用。
+- **状态管理**: 使用Flutter的StatefulWidget
+- **数据存储**: 使用shared_preferences进行本地数据持久化
+- **日期时间**: 使用intl包格式化日期和时间
+- **链接处理**: 使用url_launcher处理外部链接
 
-### 设置Android签名
+## 自定义应用
 
-1. 运行GitHub Actions工作流 `setup_keystore.yml` 来生成签名密钥
-2. 下载生成的密钥库文件和配置文件
-3. 使用以下命令生成Base64编码的密钥库：
-   ```bash
-   base64 upload-keystore.jks | tr -d '\n'
-   ```
-4. 在GitHub仓库设置中添加以下Secrets：
-   - `KEYSTORE_BASE64`: 用Base64编码的密钥库
-   - `KEYSTORE_PASSWORD`: 密钥库密码
-   - `KEY_PASSWORD`: 密钥密码
-   - `KEY_ALIAS`: 密钥别名（通常为"upload"）
+### 修改应用名称
 
-### 发布新版本
+编辑以下文件:
+- Android: `android/app/src/main/AndroidManifest.xml` 中的 `android:label`
+- Windows: `windows/runner/main.cpp` 中的 `window.Create(L"点名表", origin, size)`
+- iOS: `ios/Runner/Info.plist` 中的 `CFBundleDisplayName`
+- Web: `web/index.html` 中的 `<title>` 标签
 
-1. 为代码打上标签（格式：`v*`），例如：`v1.0.0`
-2. 推送标签到GitHub：
+### 修改应用包名
+
+1. 编辑 `android/app/build.gradle.kts` 中的 `namespace` 和 `applicationId`
+2. 更新 Kotlin 文件的包名
+3. 确保 `AndroidManifest.xml` 文件中的包名一致
+
+### 更改应用图标
+
+1. 将图标文件放在 `assets/icon/` 目录下
+2. 在 `pubspec.yaml` 中更新 `flutter_launcher_icons` 配置
+3. 运行 `flutter pub run flutter_launcher_icons` 更新所有平台的图标
+
+## CI/CD 自动化
+
+本项目使用GitHub Actions自动构建和发布应用:
+
+1. **触发方式**:
+   - 推送标签 (格式: `v*`)，如 `v1.0.0`
+   - 手动触发并指定版本号
+
+2. **工作流程**:
+   - 构建Android APK
+   - 构建Windows应用
+   - 构建Web应用
+   - 创建GitHub Release并上传构建产物
+
+3. **发布新版本**:
    ```bash
    git tag v1.0.0
    git push origin v1.0.0
    ```
-3. 这将自动触发构建工作流，生成所有平台的应用并创建GitHub Release
 
-## 自定义应用
+## 贡献指南
 
-### 更改应用名称
-
-编辑以下文件：
-- Android: `android/app/src/main/AndroidManifest.xml` 中的 `android:label`
-- Windows: `windows/runner/main.cpp` 中的 `window.Create(L"应用名称", origin, size)`
-
-### 更改包名
-
-1. 编辑 `android/app/build.gradle.kts` 中的 `namespace` 和 `applicationId`
-2. 更新 `android/app/src/main/kotlin` 目录结构和Java包名
-
-### 更改应用图标
-
-1. 将图标文件放在 `assets/icon/app_icon.png` 和 `assets/icon/app_icon_foreground.png`
-2. 运行 `flutter pub run flutter_launcher_icons` 更新所有平台的图标
+1. Fork 仓库
+2. 创建功能分支 (`git checkout -b feature/amazing-feature`)
+3. 提交更改 (`git commit -m 'Add amazing feature'`)
+4. 推送分支 (`git push origin feature/amazing-feature`)
+5. 创建Pull Request
 
 ## 许可证
 
-[您的许可证信息] 
+本项目基于MIT许可证 - 详情请查看[LICENSE](https://github.com/afoim/roll_call_app/blob/main/LICENSE)文件。
+
+## 联系方式
+
+AcoFork - https://github.com/afoim
+
+项目链接: [https://github.com/afoim/roll_call_app](https://github.com/afoim/roll_call_app) 
