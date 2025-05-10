@@ -21,7 +21,8 @@
 
 ## 应用截图
 
-*[这里可以添加应用截图]*
+![3cb65cf8c354714e1399ef5cffa4ef54](https://github.com/user-attachments/assets/b14ccf47-06dc-4040-a2d1-79896e7a026c)
+
 
 ## 快速开始
 
@@ -141,26 +142,6 @@ flutter build web --release
 2. 在 `pubspec.yaml` 中更新 `flutter_launcher_icons` 配置
 3. 运行 `flutter pub run flutter_launcher_icons` 更新所有平台的图标
 
-## CI/CD 自动化
-
-本项目使用GitHub Actions自动构建和发布应用:
-
-1. **触发方式**:
-   - 推送标签 (格式: `v*`)，如 `v1.0.0`
-   - 手动触发并指定版本号
-
-2. **工作流程**:
-   - 构建Android APK
-   - 构建Windows应用
-   - 构建Web应用
-   - 创建GitHub Release并上传构建产物
-
-3. **发布新版本**:
-   ```bash
-   git tag v1.0.0
-   git push origin v1.0.0
-   ```
-
 ## 贡献指南
 
 1. Fork 仓库
@@ -175,6 +156,6 @@ flutter build web --release
 
 ## 联系方式
 
-AcoFork - https://github.com/afoim
+AcoFork - https://link.me/acofork
 
 项目链接: [https://github.com/afoim/roll_call_app](https://github.com/afoim/roll_call_app) 
