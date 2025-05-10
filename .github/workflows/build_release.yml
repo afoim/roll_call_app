@@ -149,10 +149,19 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-    if: startsWith(github.ref, 'refs/tags/')
+    if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
     steps:
       - name: 下载所有构建产物
         uses: actions/download-artifact@v3
+      
+      - name: 设置发布标签
+        id: set_tag
+        run: |
+          if [[ ${{ github.event_name }} == 'workflow_dispatch' ]]; then
+            echo "TAG_NAME=${{ github.event.inputs.release_version }}" >> $GITHUB_ENV
+          else
+            echo "TAG_NAME=${{ github.ref_name }}" >> $GITHUB_ENV
+          fi
       
       - name: 创建 Release
         uses: softprops/action-gh-release@v1
@@ -162,12 +171,13 @@ jobs:
             windows-release/roll_call_app_windows.zip
             linux-release/roll_call_app_linux.tar.gz
             web-release/roll_call_app_web.zip
-          name: 智能点名表 ${{ github.ref_name }}
+          name: 智能点名表 ${{ env.TAG_NAME }}
           body: |
-            智能点名表应用 ${{ github.ref_name }} 版本发布
+            智能点名表应用 ${{ env.TAG_NAME }} 版本发布
             
             ## 下载
-            - [Android APK](https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/app-release.apk)
-            - [Windows 应用](https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/roll_call_app_windows.zip)
-            - [Linux 应用](https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/roll_call_app_linux.tar.gz)
-            - [Web 应用](https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/roll_call_app_web.zip) 
+            - [Android APK](https://github.com/${{ github.repository }}/releases/download/${{ env.TAG_NAME }}/app-release.apk)
+            - [Windows 应用](https://github.com/${{ github.repository }}/releases/download/${{ env.TAG_NAME }}/roll_call_app_windows.zip)
+            - [Linux 应用](https://github.com/${{ github.repository }}/releases/download/${{ env.TAG_NAME }}/roll_call_app_linux.tar.gz)
+            - [Web 应用](https://github.com/${{ github.repository }}/releases/download/${{ env.TAG_NAME }}/roll_call_app_web.zip)
+          tag_name: ${{ env.TAG_NAME }} 
