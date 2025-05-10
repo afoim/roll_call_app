@@ -1,0 +1,168 @@
+name: 构建和发布应用
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  build-android:
+    name: 构建 Android APK
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: 设置 Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+      
+      - name: 设置 Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.19.3'
+          channel: 'stable'
+      
+      - name: 获取依赖
+        run: flutter pub get
+      
+      - name: 构建 APK
+        run: flutter build apk --release --verbose
+      
+      - name: 上传 APK
+        uses: actions/upload-artifact@v3
+        with:
+          name: android-release
+          path: build/app/outputs/flutter-apk/app-release.apk
+  
+  build-windows:
+    name: 构建 Windows 应用
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: 设置 Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.19.3'
+          channel: 'stable'
+      
+      - name: 启用 Windows 桌面支持
+        run: flutter config --enable-windows-desktop
+      
+      - name: 获取依赖
+        run: flutter pub get
+      
+      - name: 构建 Windows
+        run: flutter build windows --release --verbose
+      
+      - name: 打包 Windows 应用
+        run: |
+          cd build/windows/x64/runner/Release
+          Compress-Archive -Path * -DestinationPath roll_call_app_windows.zip
+      
+      - name: 上传 Windows 应用
+        uses: actions/upload-artifact@v3
+        with:
+          name: windows-release
+          path: build/windows/x64/runner/Release/roll_call_app_windows.zip
+  
+  build-linux:
+    name: 构建 Linux 应用
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: 安装 Linux 依赖
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y ninja-build libgtk-3-dev
+      
+      - name: 设置 Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.19.3'
+          channel: 'stable'
+      
+      - name: 启用 Linux 桌面支持
+        run: flutter config --enable-linux-desktop
+      
+      - name: 获取依赖
+        run: flutter pub get
+      
+      - name: 构建 Linux
+        run: flutter build linux --release --verbose
+      
+      - name: 打包 Linux 应用
+        run: |
+          cd build/linux/x64/release/bundle
+          tar -czvf ../../../../../roll_call_app_linux.tar.gz *
+      
+      - name: 上传 Linux 应用
+        uses: actions/upload-artifact@v3
+        with:
+          name: linux-release
+          path: roll_call_app_linux.tar.gz
+  
+  build-web:
+    name: 构建 Web 应用
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: 设置 Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.19.3'
+          channel: 'stable'
+      
+      - name: 启用 Web 支持
+        run: flutter config --enable-web
+      
+      - name: 获取依赖
+        run: flutter pub get
+      
+      - name: 构建 Web
+        run: flutter build web --release --verbose
+      
+      - name: 打包 Web 应用
+        run: |
+          cd build/web
+          zip -r ../../roll_call_app_web.zip *
+      
+      - name: 上传 Web 应用
+        uses: actions/upload-artifact@v3
+        with:
+          name: web-release
+          path: roll_call_app_web.zip
+  
+  create-release:
+    name: 创建 GitHub Release
+    needs: [build-android, build-windows, build-linux, build-web]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    if: startsWith(github.ref, 'refs/tags/')
+    steps:
+      - name: 下载所有构建产物
+        uses: actions/download-artifact@v3
+      
+      - name: 创建 Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            android-release/app-release.apk
+            windows-release/roll_call_app_windows.zip
+            linux-release/roll_call_app_linux.tar.gz
+            web-release/roll_call_app_web.zip
+          name: 智能点名表 ${{ github.ref_name }}
+          body: |
+            智能点名表应用 ${{ github.ref_name }} 版本发布
+            
+            ## 下载
+            - [Android APK](https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/app-release.apk)
+            - [Windows 应用](https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/roll_call_app_windows.zip)
+            - [Linux 应用](https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/roll_call_app_linux.tar.gz)
+            - [Web 应用](https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/roll_call_app_web.zip) 

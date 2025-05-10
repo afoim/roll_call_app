@@ -53,12 +53,12 @@ dev_dependencies:
 flutter_launcher_icons:
   android: true
   ios: true
-  image_path: "assets/icon/app_icon.png"
+  image_path: "assets/icon/icon.jpg"
   adaptive_icon_background: "#FFFFFF"
-  adaptive_icon_foreground: "assets/icon/app_icon_foreground.png"
+  adaptive_icon_foreground: "assets/icon/icon.jpg"
   windows:
     generate: true
-    image_path: "assets/icon/app_icon.png"
+    image_path: "assets/icon/icon.jpg"
     icon_size: 48
 
 # For information on the generic Dart part of this file, see the
